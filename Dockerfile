@@ -1,32 +1,22 @@
 FROM ubuntu:22.04
 
-####### Install Node.js v14.x
-RUN apt-get clean
-RUN apt-get autoremove
-RUN apt-get update -qq && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -qq \
-        curl \
-        sudo \
-        git \
-        jq \
-        zip \
-        unzip \
-        rsync \
-        libxml2-utils \
-        make \
-        libxkbcommon-x11-0
+ENV DEBIAN_FRONTEND=noninteractive
+ARG SALESFORCE_CLI_VERSION=latest-rc
+ARG SF_CLI_VERSION=latest-rc
 
-RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash - \
-    && sudo apt-get install -qq nodejs
+####### Install Node
+RUN echo 'a0f23911d5d9c371e95ad19e4e538d19bffc0965700f187840eb39a91b0c3fb0  ./nodejs.tar.gz' > node-file-lock.sha \
+    && curl -s -o nodejs.tar.gz https://nodejs.org/dist/v16.13.2/node-v16.13.2-linux-x64.tar.gz \
+    && shasum --check node-file-lock.sha
+RUN mkdir /usr/local/lib/nodejs \
+    && tar xf nodejs.tar.gz -C /usr/local/lib/nodejs/ --strip-components 1 \
+    && rm nodejs.tar.gz node-file-lock.sha
 
-####### Install OpenJDK-11
+####### Install Java
 RUN apt-get update && apt-get install --assume-yes openjdk-11-jdk-headless jq
 RUN apt-get autoremove --assume-yes \
     && apt-get clean --assume-yes \
     && rm -rf /var/lib/apt/lists/*
-
-ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
-RUN export JAVA_HOME
 
 ####### Set XDG environment variables explicitly so that GitHub Actions does not apply
 ####### default paths that do not point to the plugins directory
@@ -48,10 +38,15 @@ RUN export XDG_DATA_HOME && \
     export XDG_CACHE_HOME
 
 ####### Install SFDX CLI
-RUN npm update -g && \
-    npm install sfdx-cli --global
+ENV PATH=/usr/local/lib/nodejs/bin:$PATH
+RUN npm install --global sfdx-cli@${SALESFORCE_CLI_VERSION} --ignore-scripts
+RUN npm install --global @salesforce/cli@${SF_CLI_VERSION}
 
 ####### Install sfdx plugins
 RUN echo 'y' | sfdx plugins:install sfdmu
-RUN echo "y" | sfdx plugins:install sfdx-git-delta
+RUN echo 'y' | sfdx plugins:install sfdx-git-delta
 RUN sfdx plugins:install @salesforce/sfdx-scanner
+
+ENV SFDX_CONTAINER_MODE true
+ENV DEBIAN_FRONTEND=dialog
+ENV SHELL /bin/bash
