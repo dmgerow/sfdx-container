@@ -4,6 +4,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 ARG SALESFORCE_CLI_VERSION=latest-rc
 ARG SF_CLI_VERSION=latest-rc
 
+####### Install Pre-reqs
+RUN apt-get update && apt-get install --assume-yes \
+        curl \
+        git
+
 ####### Install Node
 RUN echo 'a0f23911d5d9c371e95ad19e4e538d19bffc0965700f187840eb39a91b0c3fb0  ./nodejs.tar.gz' > node-file-lock.sha \
     && curl -s -o nodejs.tar.gz https://nodejs.org/dist/v16.13.2/node-v16.13.2-linux-x64.tar.gz \
