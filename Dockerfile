@@ -7,6 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ####### Install Pre-reqs
 RUN apt-get update && apt-get install --assume-yes \
         curl \
+        python3 \
         git
 
 ####### Install Node
