@@ -1,8 +1,8 @@
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-ARG SALESFORCE_CLI_VERSION=latest-rc
-ARG SF_CLI_VERSION=latest-rc
+# ARG SALESFORCE_CLI_VERSION=latest-rc
+# ARG SF_CLI_VERSION=latest-rc
 
 ####### Install Pre-reqs
 RUN apt-get update && apt-get install --assume-yes \
