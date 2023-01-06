@@ -44,8 +44,10 @@ RUN export XDG_DATA_HOME && \
 
 ####### Install SFDX CLI
 ENV PATH=/usr/local/lib/nodejs/bin:$PATH
-RUN npm install --global sfdx-cli@${SALESFORCE_CLI_VERSION} --ignore-scripts
-RUN npm install --global @salesforce/cli@${SF_CLI_VERSION}
+# RUN npm install --global sfdx-cli@${SALESFORCE_CLI_VERSION} --ignore-scripts
+# RUN npm install --global @salesforce/cli@${SF_CLI_VERSION}
+RUN npm install --global sfdx-cli --ignore-scripts
+RUN npm install --global @salesforce/cli
 
 ####### Install sfdx plugins
 RUN echo 'y' | sfdx plugins:install sfdmu
